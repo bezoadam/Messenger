@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		22BB1FDD80C60BC8CE835405 /* Pods_Messenger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D5C2DFCD051E320F68344B2 /* Pods_Messenger.framework */; };
+		847C0A951E9E280F00424777 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847C0A941E9E280F00424777 /* NewMessageController.swift */; };
+		847C0A981E9E2B8D00424777 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847C0A971E9E2B8D00424777 /* User.swift */; };
+		847C0A9A1E9E357100424777 /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847C0A991E9E357100424777 /* LoginController+handlers.swift */; };
+		847C0A9D1E9FA53100424777 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847C0A9C1E9FA53100424777 /* Extensions.swift */; };
 		84EFEBD01E9C08200022C3BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EFEBCF1E9C08200022C3BB /* AppDelegate.swift */; };
-		84EFEBD21E9C08200022C3BB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EFEBD11E9C08200022C3BB /* ViewController.swift */; };
+		84EFEBD21E9C08200022C3BB /* MessagesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EFEBD11E9C08200022C3BB /* MessagesController.swift */; };
 		84EFEBD51E9C08200022C3BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84EFEBD31E9C08200022C3BB /* Main.storyboard */; };
 		84EFEBD71E9C08200022C3BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84EFEBD61E9C08200022C3BB /* Assets.xcassets */; };
 		84EFEBDA1E9C08200022C3BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84EFEBD81E9C08200022C3BB /* LaunchScreen.storyboard */; };
@@ -20,9 +24,13 @@
 /* Begin PBXFileReference section */
 		1F488E51A13B16DB66526368 /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Pods/Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 		3D5C2DFCD051E320F68344B2 /* Pods_Messenger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Messenger.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		847C0A941E9E280F00424777 /* NewMessageController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
+		847C0A971E9E2B8D00424777 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		847C0A991E9E357100424777 /* LoginController+handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
+		847C0A9C1E9FA53100424777 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		84EFEBCC1E9C08200022C3BB /* Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84EFEBCF1E9C08200022C3BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		84EFEBD11E9C08200022C3BB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		84EFEBD11E9C08200022C3BB /* MessagesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesController.swift; sourceTree = "<group>"; };
 		84EFEBD41E9C08200022C3BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		84EFEBD61E9C08200022C3BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		84EFEBD91E9C08200022C3BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -53,6 +61,22 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		847C0A961E9E2B6900424777 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				847C0A971E9E2B8D00424777 /* User.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		847C0A9B1E9FA52100424777 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				847C0A9C1E9FA53100424777 /* Extensions.swift */,
+			);
+			name = Helpers;
+			sourceTree = "<group>";
+		};
 		84EFEBC31E9C08200022C3BB = {
 			isa = PBXGroup;
 			children = (
@@ -74,6 +98,8 @@
 		84EFEBCE1E9C08200022C3BB /* Messenger */ = {
 			isa = PBXGroup;
 			children = (
+				847C0A9B1E9FA52100424777 /* Helpers */,
+				847C0A961E9E2B6900424777 /* Model */,
 				84EFEBE31E9C0B2E0022C3BB /* Controller */,
 				84EFEBCF1E9C08200022C3BB /* AppDelegate.swift */,
 				84EFEBD31E9C08200022C3BB /* Main.storyboard */,
@@ -89,7 +115,9 @@
 			isa = PBXGroup;
 			children = (
 				84EFEBE41E9C0B5B0022C3BB /* LoginController.swift */,
-				84EFEBD11E9C08200022C3BB /* ViewController.swift */,
+				847C0A991E9E357100424777 /* LoginController+handlers.swift */,
+				84EFEBD11E9C08200022C3BB /* MessagesController.swift */,
+				847C0A941E9E280F00424777 /* NewMessageController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -227,9 +255,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84EFEBD21E9C08200022C3BB /* ViewController.swift in Sources */,
+				847C0A951E9E280F00424777 /* NewMessageController.swift in Sources */,
+				84EFEBD21E9C08200022C3BB /* MessagesController.swift in Sources */,
+				847C0A9A1E9E357100424777 /* LoginController+handlers.swift in Sources */,
 				84EFEBE51E9C0B5B0022C3BB /* LoginController.swift in Sources */,
+				847C0A981E9E2B8D00424777 /* User.swift in Sources */,
 				84EFEBD01E9C08200022C3BB /* AppDelegate.swift in Sources */,
+				847C0A9D1E9FA53100424777 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +427,7 @@
 				84EFEBE01E9C08200022C3BB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
