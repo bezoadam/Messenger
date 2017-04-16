@@ -13,17 +13,7 @@ class UserCell: UITableViewCell {
     
     var message: Message? {
         didSet {
-            if let toId = message?.toId {
-                let ref = FIRDatabase.database().reference().child("users").child(toId)
-                ref.observeSingleEvent(of: .value, with: { (snapshot) in
-                    if let dictionairy = snapshot.value as? [String:Any] {
-                        self.textLabel?.text = dictionairy["names"] as? String
-                        if let profileImageUrl = dictionairy["profileImageUrl"] as? String {
-                            self.profileImageView.loadImageUsingCachceWithUrlString(urlString: profileImageUrl)
-                        }
-                    }
-                }, withCancel: nil)
-            }
+            setupNameAndProfileImage()
             detailTextLabel?.text = message?.text//
             
             if let seconds = message?.timestamp?.doubleValue {
@@ -34,6 +24,21 @@ class UserCell: UITableViewCell {
                 timeLabel.text = dateFormatter.string(from: timestampDate as Date)
             }
             
+        }
+    }
+    
+    private func setupNameAndProfileImage() {
+        
+        if let id = message?.chatPartnerID() {
+            let ref = FIRDatabase.database().reference().child("users").child(id)
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                if let dictionairy = snapshot.value as? [String:Any] {
+                    self.textLabel?.text = dictionairy["names"] as? String
+                    if let profileImageUrl = dictionairy["profileImageUrl"] as? String {
+                        self.profileImageView.loadImageUsingCachceWithUrlString(urlString: profileImageUrl)
+                    }
+                }
+            }, withCancel: nil)
         }
     }
     
@@ -54,7 +59,6 @@ class UserCell: UITableViewCell {
     
     let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "HH:MM:SS"
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = UIColor.lightGray
         label.translatesAutoresizingMaskIntoConstraints = false

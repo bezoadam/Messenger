@@ -20,7 +20,7 @@ class MessagesController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(handleNewMessage))
         
         checkIfUserIsLoggedIn()
-        observerMessages()
+//        observerMessages()
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellid)
         
@@ -28,6 +28,41 @@ class MessagesController: UITableViewController {
 
     var messages = [Message]()
     var messagesDictionairy = [String: Message]()
+    
+    func observeUserMessages() {
+        
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+            return
+        }
+        
+        let ref = FIRDatabase.database().reference().child("user-messages").child(uid)
+        ref.observe(.childAdded, with: { (snapshot) in
+            let messageId = snapshot.key
+            let messageReference = FIRDatabase.database().reference().child("messages").child(messageId)
+            messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                
+                if let dictionairy = snapshot.value as? [String: Any] {
+                    let message = Message()
+                    message.setValuesForKeys(dictionairy)
+                    self.messages.append(message)
+                    
+                    if let toId = message.toId {
+                        self.messagesDictionairy[toId] = message
+                        self.messages = Array(self.messagesDictionairy.values)
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
+                        })
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+
+                
+            }, withCancel: nil)
+        }, withCancel: nil)
+    }
     
     func observerMessages() {
         let ref = FIRDatabase.database().reference().child("messages")
@@ -70,6 +105,33 @@ class MessagesController: UITableViewController {
         return 72
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let message = messages[indexPath.row]
+        
+        guard let chatPartnerId = message.chatPartnerID() else {
+            return
+        }
+        
+        let ref = FIRDatabase.database().reference().child("users").child(chatPartnerId)
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            guard let dictionairy = snapshot.value as? [String:Any] else {
+                return
+            }
+            
+            let user = User()
+            user.id = chatPartnerId
+            user.name = dictionairy["names"] as? String
+            user.email = dictionairy["email"] as? String
+            user.profileImageUrl = dictionairy["profileImageUrl"] as? String
+            self.showChatController(user: user)
+            
+            
+        }, withCancel: nil)
+        
+    }
+    
     func handleNewMessage() {
         let newMessageController = NewMessageController()
         newMessageController.messagesController = self
@@ -88,6 +150,7 @@ class MessagesController: UITableViewController {
     }
     
     func fetchUserAndSetupNavBarTitle() {
+        
         guard let uid = FIRAuth.auth()?.currentUser?.uid else {
             return
         }
@@ -108,6 +171,11 @@ class MessagesController: UITableViewController {
     
     func setupNavBarWithUser(user: User) {
 //        self.navigationItem.title = user.name
+        
+        messages.removeAll()
+        messagesDictionairy.removeAll()
+        tableView.reloadData()
+        observeUserMessages()
         
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
