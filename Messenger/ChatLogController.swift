@@ -11,6 +11,12 @@ import Firebase
 
 class ChatLogController: UICollectionViewController, UITextFieldDelegate {
     
+    var user: User? {
+        didSet {
+            navigationItem.title = user?.name
+        }
+    }
+    
     lazy var inputTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter messages..."
@@ -68,7 +74,11 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate {
     func handleSend() {
         let ref = FIRDatabase.database().reference().child("messages")
         let childRef = ref.childByAutoId()
-        
+        let toId = user!.id!
+        let fromId = FIRAuth.auth()!.currentUser!.uid
+        let timestamp = Int(NSDate().timeIntervalSince1970)
+        let values = ["text": inputTextField.text!, "toId": toId, "fromId": fromId, "timestamp": timestamp] as [String : Any]
+        childRef.updateChildValues(values)
         
         
     }

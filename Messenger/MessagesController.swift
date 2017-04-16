@@ -11,6 +11,8 @@ import Firebase
 
 class MessagesController: UITableViewController {
 
+    let cellid = "cellid"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -18,14 +20,59 @@ class MessagesController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(handleNewMessage))
         
         checkIfUserIsLoggedIn()
+        observerMessages()
+        
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellid)
+        
     }
 
-//    override func viewWillAppear(_ animated: Bool) {
-//        checkIfUserIsLoggedIn()
-//    }
+    var messages = [Message]()
+    var messagesDictionairy = [String: Message]()
+    
+    func observerMessages() {
+        let ref = FIRDatabase.database().reference().child("messages")
+        ref.observe(.childAdded, with: { (snapshot) in
+            
+            if let dictionairy = snapshot.value as? [String: Any] {
+                let message = Message()
+                message.setValuesForKeys(dictionairy)
+                self.messages.append(message)
+                
+                if let toId = message.toId {
+                    self.messagesDictionairy[toId] = message
+                    self.messages = Array(self.messagesDictionairy.values)
+                    self.messages.sort(by: { (message1, message2) -> Bool in
+                        return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
+                    })
+                }
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+        }, withCancel: nil)
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellid")
+        let message = messages[indexPath.row]
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellid, for: indexPath) as? UserCell
+        cell?.message = message
+        return cell!
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
+    }
     
     func handleNewMessage() {
         let newMessageController = NewMessageController()
+        newMessageController.messagesController = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -101,12 +148,13 @@ class MessagesController: UITableViewController {
         
         self.navigationItem.titleView = titleView
         
-        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+//        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
         
     }
     
-    func showChatController() {
+    func showChatController(user: User) {
         let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+        chatLogController.user = user
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     
