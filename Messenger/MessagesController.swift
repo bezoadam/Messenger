@@ -20,7 +20,6 @@ class MessagesController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(handleNewMessage))
         
         checkIfUserIsLoggedIn()
-//        observerMessages()
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellid)
         
@@ -46,17 +45,16 @@ class MessagesController: UITableViewController {
                     message.setValuesForKeys(dictionairy)
                     self.messages.append(message)
                     
-                    if let toId = message.toId {
-                        self.messagesDictionairy[toId] = message
+                    if let chatPartnerId = message.chatPartnerID() {
+                        self.messagesDictionairy[chatPartnerId] = message
                         self.messages = Array(self.messagesDictionairy.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in
                             return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
                         })
                     }
-                    
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+                    self.timer?.invalidate()
+                    self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+                
                 }
 
                 
@@ -64,28 +62,12 @@ class MessagesController: UITableViewController {
         }, withCancel: nil)
     }
     
-    func observerMessages() {
-        let ref = FIRDatabase.database().reference().child("messages")
-        ref.observe(.childAdded, with: { (snapshot) in
-            
-            if let dictionairy = snapshot.value as? [String: Any] {
-                let message = Message()
-                message.setValuesForKeys(dictionairy)
-                self.messages.append(message)
-                
-                if let toId = message.toId {
-                    self.messagesDictionairy[toId] = message
-                    self.messages = Array(self.messagesDictionairy.values)
-                    self.messages.sort(by: { (message1, message2) -> Bool in
-                        return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
-                    })
-                }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            }
-        }, withCancel: nil)
+    var timer : Timer?
+    
+    func handleReloadTable() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

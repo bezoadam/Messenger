@@ -57,7 +57,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         let textField = UITextField()
         textField.placeholder = "Enter messages..."
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.delegate = self as? UITextFieldDelegate
+        textField.delegate = self  as? UITextFieldDelegate
         return textField
     }()
     
@@ -66,6 +66,8 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        collectionView?.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 58, right: 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
         collectionView?.backgroundColor = UIColor.white
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellid)
         collectionView?.alwaysBounceVertical = true
@@ -84,12 +86,57 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         cell.textView.text = message.text
         
+        setupCell(cell: cell, message: message)
+        
+        cell.bubbleViewWidthAnchor?.constant = estimateHeightText(text: message.text!).width + 32
         
         return cell
     }
     
+    private func setupCell(cell: ChatMessageCell, message: Message) {
+        
+        if let profileImageUrl = self.user?.profileImageUrl {
+            cell.profileImageView.loadImageUsingCachceWithUrlString(urlString: profileImageUrl)
+        }
+        if message.fromId == FIRAuth.auth()?.currentUser?.uid {
+            //odchadzajuca sprava - modra
+            cell.bubbleView.backgroundColor = ChatMessageCell.blueColor
+            cell.textView.textColor = UIColor.white
+            cell.profileImageView.isHidden = true
+            cell.bubbleViewRightAnchor?.isActive = true
+            cell.bubbleViewLeftAnchor?.isActive = false
+        } else{
+            //prichadzajuca sprava - seda
+            cell.bubbleView.backgroundColor = UIColor(r: 240, g: 240, b: 240)
+            cell.textView.textColor = UIColor.black
+            cell.bubbleViewRightAnchor?.isActive = false
+            cell.bubbleViewLeftAnchor?.isActive = true
+            cell.profileImageView.isHidden = false
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 80)
+        
+        var height = CGFloat(80)
+        
+        if let message = self.messages[indexPath.row].text {
+            height = estimateHeightText(text: message).height + 20
+        }
+        
+        return CGSize(width: view.frame.width, height: height)
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView?.collectionViewLayout.invalidateLayout()
+    }
+    
+    private func estimateHeightText(text: String) -> CGRect {
+        let size = CGSize(width: 200, height: 2500)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        
+        let text = NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16)] , context: nil)
+        
+        return text
     }
     
     func setupInputComponents() {
@@ -146,6 +193,8 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                 print(error!)
                 return
             }
+            
+            self.inputTextField.text = nil
             
             let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(fromId)
             
